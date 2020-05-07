@@ -63,7 +63,11 @@
     (partial merge-with +block)
     dice))
 
-(def rank (juxt '* :range '⚡))
+(defn damage [totals]
+  (let [v (get totals '* 0)]
+    (if (= v :block) 0 v)))
+
+(def rank (juxt damage :range '⚡))
 
 (defn rolls [dice]
   (map sum (apply combo/cartesian-product dice)))
@@ -75,9 +79,8 @@
            [roll (/ cnt total)])
          (sort-by (juxt second (comp rank first))))))
 
-(defn avg-all [dice]
-  (let [all (rolls dice)
-        cnts (sum all)]
+(defn avg-all [all]
+  (let [cnts (sum all)]
     (->> (for [[k v] cnts]
            [k (double (/ v (count all)))])
          (into {}))))
